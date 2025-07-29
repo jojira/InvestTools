@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leveraged Trade Price Target Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      font-weight: bold;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Leveraged Trade Calculator</h1>
+    <label for="entryPrice">Entry Price ($):</label>
+    <input type="number" id="entryPrice" step="0.01" required>
+
+    <label for="leverage">Leverage (e.g. 5):</label>
+    <input type="number" id="leverage" step="0.1" required>
+
+    <label for="targetGain">Target Gain (%):</label>
+    <input type="number" id="targetGain" step="0.1" required>
+
+    <label for="positionType">Position Type:</label>
+    <select id="positionType">
+      <option value="long">Long</option>
+      <option value="short">Short</option>
+    </select>
+
+    <button onclick="calculateTargetPrice()">Calculate</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function calculateTargetPrice() {
+      const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+      const leverage = parseFloat(document.getElementById('leverage').value);
+      const targetGain = parseFloat(document.getElementById('targetGain').value);
+      const positionType = document.getElementById('positionType').value;
+
+      if (isNaN(entryPrice) || isNaN(leverage) || isNaN(targetGain) || leverage <= 0) {
+        document.getElementById('result').textContent = 'Please enter valid numbers.';
+        return;
+      }
+
+      let targetPrice;
+      let liquidationPrice;
+
+      if (positionType === 'long') {
+        targetPrice = entryPrice * (1 + targetGain / (100 * leverage));
+        liquidationPrice = entryPrice * (1 - (1 / leverage));
+      } else if (positionType === 'short') {
+        targetPrice = entryPrice * (1 - targetGain / (100 * leverage));
+        liquidationPrice = entryPrice * (1 + (1 / leverage));
+      } else {
+        document.getElementById('result').textContent = 'Invalid position type.';
+        return;
+      }
+
+      document.getElementById('result').innerHTML = `
+        Target price: $${targetPrice.toFixed(2)}<br>
+        Estimated liquidation price: $${liquidationPrice.toFixed(2)}
+      `;
+    }
+  </script>
+</body>
+</html>
